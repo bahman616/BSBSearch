@@ -1,0 +1,63 @@
+﻿@page "/bsb"
+
+<PageTitle>Search for a BSB</PageTitle>
+
+@using BsbSearch.Data
+@using BsbSearch.Models
+@using System.Text.Json
+@using System.Net.Http.Headers
+@using System.Linq
+@inject IHttpClientFactory ClientFactory
+
+<h1>Search for a BSB</h1>
+
+<div class="form-row">
+    <div class="form-group col-md-3 col-sm-12">
+        <label for="exampleInputEmail1">BSB Number</label>
+        <input @bind="bsb" class="form-control" placeholder="Enter BSB"/>
+    </div>
+</div>
+<button @onclick="Search" class="btn btn-primary">Search</button>
+
+
+@if (!string.IsNullOrEmpty(bsb) && BsbRecord == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if(BsbRecord != null)
+{
+    <div class="panel panel-default">
+      <h3 >Here are the details for @BsbRecord.Number:</h3>
+      <div class="panel-body">
+          <div>BSB: @BsbRecord.Number</div>
+          <div>FICode: @BsbRecord.FICode</div>
+          <div>Financial Institution Name: @BsbRecord.Name</div>
+          <div>BSB Address: @BsbRecord.Address</div>
+          <div>Suburb/Town/City: @BsbRecord.Suburb</div>
+          <div>State: @BsbRecord.State</div>
+          <div>Postcode: @BsbRecord.PostCode</div>
+          <div>Payment Systems: @BsbRecord.PaymentSystems</div>
+      </div>
+    </div>
+}
+
+
+@code {
+    private BsbRecord? BsbRecord;
+
+    public string bsb { get; set; } = "";
+
+    protected async Task Search()
+    {
+        var clientlocal = ClientFactory.CreateClient("LocalBackendApi");
+        var response = await clientlocal.GetAsync($"api/bsb/{bsb}");
+        var content = await response.Content.ReadAsStringAsync();
+
+        var options = new JsonSerializerOptions 
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        };
+        BsbRecord = JsonSerializer.Deserialize<BsbRecord?>(content, options);
+    }
+
+}

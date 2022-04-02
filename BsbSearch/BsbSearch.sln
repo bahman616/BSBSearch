@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BsbSearch", "BsbSearch.csproj", "{27A85C1D-BD7F-484A-B546-C19E596952EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BsbSearch", "BsbSearch.csproj", "{27A85C1D-BD7F-484A-B546-C19E596952EF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BsbSearch.Test", "..\BsbSearch.Test\BsbSearch.Test.csproj", "{F4723669-0A75-448B-A5F9-15D18384B31D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BsbSearch.Test", "..\BsbSearch.Test\BsbSearch.Test.csproj", "{F4723669-0A75-448B-A5F9-15D18384B31D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
