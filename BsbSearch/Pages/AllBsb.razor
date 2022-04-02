@@ -69,7 +69,11 @@ else
     protected override async Task OnInitializedAsync()
     {
         var clientlocal = ClientFactory.CreateClient("LocalBackendApi");
+        // These credentials can be moved to app settings
+        clientlocal.DefaultRequestHeaders.Add("team-name","TeamOne");
+        clientlocal.DefaultRequestHeaders.Add("very-very-secure", "FFGFG&^%%SsasDDH");
         var response = await clientlocal.GetAsync("api/bsb");
+
         var content = await response.Content.ReadAsStringAsync();
 
         var options = new JsonSerializerOptions 

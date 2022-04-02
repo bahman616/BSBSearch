@@ -23,5 +23,15 @@ namespace BsbSearch.Services
                 await w.WriteAsync(json);
             }
         }
+
+        public async Task<List<Partner>?> GetAllPartners()
+        {
+            using (StreamReader r = new StreamReader("data/Partners.json"))
+            {
+                string json = await r.ReadToEndAsync();
+                var items = JsonSerializer.Deserialize<List<Partner>>(json);
+                return items;
+            }
+        }
     }
 }

@@ -6,5 +6,6 @@ namespace BsbSearch.Services
     {
         Task<List<BsbRecord>?> GetAllBsbRecords();
         Task UpdateBsbRecord(List<BsbRecord> bsbRecords);
+        Task<List<Partner>?> GetAllPartners();
     }
 }
