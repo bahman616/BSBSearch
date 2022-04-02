@@ -13,7 +13,7 @@ namespace BsbSearch.Test.Services
         private Mock<IFileService> fileService = new Mock<IFileService>();
 
         public BsbServiceTests() => 
-            this.service = new BsbService(new Mock<ILogger>().Object, fileService.Object);
+            this.service = new BsbService(new Mock<ILogger<BsbService>>().Object, fileService.Object);
 
         [Fact]
         public void GetBsbRecord_Should_Return_ArgumentNullException_When_Bsb_IsNull()

@@ -4,10 +4,10 @@ namespace BsbSearch.Services
 {
     public class BsbService : IBsbService
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<BsbService> _logger;
         private readonly IFileService _fileService;
 
-        public BsbService(ILogger logger, IFileService fileService) =>
+        public BsbService(ILogger<BsbService> logger, IFileService fileService) =>
             (_logger, _fileService) = (logger, fileService);
 
         public List<BsbRecord>? GetAllBsbRecords() => _fileService.GetAllBsbRecords();
