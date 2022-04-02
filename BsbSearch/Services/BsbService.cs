@@ -10,9 +10,9 @@ namespace BsbSearch.Services
         public BsbService(ILogger<BsbService> logger, IFileService fileService) =>
             (_logger, _fileService) = (logger, fileService);
 
-        public List<BsbRecord>? GetAllBsbRecords() => _fileService.GetAllBsbRecords();
+        public async Task<List<BsbRecord>?> GetAllBsbRecords() => await _fileService.GetAllBsbRecords();
 
-        public BsbRecord? GetBsbRecord(string bsb)
+        public async Task<BsbRecord?> GetBsbRecord(string bsb)
         {
             if (string.IsNullOrEmpty(bsb))
             {
@@ -26,8 +26,23 @@ namespace BsbSearch.Services
                 throw new ArgumentOutOfRangeException(nameof(bsb));
             }
 
+            var allBsbRecords = await _fileService.GetAllBsbRecords();
+            return allBsbRecords?.Where(bsbRecord => bsbRecord.Number == bsb).SingleOrDefault();
+        }
 
-            return _fileService.GetAllBsbRecords()?.Where(bsbRecord => bsbRecord.Number == bsb).SingleOrDefault();
+        public async Task UpdateBsbRecord(string id, BsbRecord bsbRecord) {
+            var allBsbRecords = await GetAllBsbRecords();
+
+            if (allBsbRecords != null)
+            {
+                var itemsExcludingTheUpdatedOne = allBsbRecords.Where(b => b.Id != id).ToList();
+                itemsExcludingTheUpdatedOne.Add(bsbRecord);
+                await _fileService.UpdateBsbRecord(itemsExcludingTheUpdatedOne);
+            }
+            else 
+            { 
+                await _fileService.UpdateBsbRecord(new List<BsbRecord>() { bsbRecord });
+            }
         }
     }
 }

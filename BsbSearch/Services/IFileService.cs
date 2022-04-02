@@ -4,6 +4,7 @@ namespace BsbSearch.Services
 {
     public interface IFileService
     {
-        List<BsbRecord>? GetAllBsbRecords();
+        Task<List<BsbRecord>?> GetAllBsbRecords();
+        Task UpdateBsbRecord(List<BsbRecord> bsbRecords);
     }
 }

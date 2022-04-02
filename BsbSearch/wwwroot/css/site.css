@@ -68,6 +68,11 @@ a, .btn-link {
     margin-top: 10px;
 }
 
+.form-group label {
+    min-width: 300px;
+}
+
+
 .panel {
     margin-top: 10px;
 }

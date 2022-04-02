@@ -4,7 +4,8 @@ namespace BsbSearch.Services
 {
     public interface IBsbService
     {
-        public List<BsbRecord>? GetAllBsbRecords();
-        public BsbRecord? GetBsbRecord(string bsb);
+        public Task<List<BsbRecord>?> GetAllBsbRecords();
+        public Task<BsbRecord?> GetBsbRecord(string bsb);
+        public Task UpdateBsbRecord(string id, BsbRecord bsbRecord);
     }
 }

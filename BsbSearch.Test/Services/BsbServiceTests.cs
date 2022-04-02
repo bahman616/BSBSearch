@@ -1,8 +1,11 @@
+using BsbSearch.Models;
 using BsbSearch.Services;
 using BsbSearch.Test.Builders;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace BsbSearch.Test.Services
@@ -16,24 +19,26 @@ namespace BsbSearch.Test.Services
             this.service = new BsbService(new Mock<ILogger<BsbService>>().Object, fileService.Object);
 
         [Fact]
-        public void GetBsbRecord_Should_Return_ArgumentNullException_When_Bsb_IsNull()
+        public async Task GetBsbRecord_Should_Return_ArgumentNullException_When_Bsb_IsNull()
         {
-            Assert.Throws<ArgumentNullException>(() => service.GetBsbRecord(string.Empty));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => service.GetBsbRecord(string.Empty));
         }
 
         [Fact]
-        public void GetBsbRecord_Should_Return_ArgumentOutOfRangeException_When_Bsb_Not_Six_Characters()
+        public async Task GetBsbRecord_Should_Return_ArgumentOutOfRangeException_When_Bsb_Not_Six_Characters()
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => service.GetBsbRecord("123."));
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => service.GetBsbRecord("123."));
         }
 
         [Fact]
-        public void GetBsbRecord_Should_Filter_Bsbs()
+        public async Task GetBsbRecord_Should_Filter_Bsbs()
         {
-            fileService.Setup(
-                f => f.GetAllBsbRecords()).Returns(new BsbRecordBuilder().WithAllFields().Build());
+            fileService
+                .Setup(f => f.GetAllBsbRecords())
+                .Returns(Task.FromResult<List<BsbRecord>?>(
+                    new BsbRecordBuilder().AllRecordsWithAllFields().Build()));
 
-            var result = service.GetBsbRecord("985555");
+            var result = await service.GetBsbRecord("985555");
 
             Assert.NotNull(result);
             Assert.Equal("985555", result?.Number);
@@ -41,14 +46,46 @@ namespace BsbSearch.Test.Services
         }
 
         [Fact]
-        public void GetBsbRecord_Should_Return_Empty_When_Bsb_Not_Found()
+        public async Task GetBsbRecord_Should_Return_Empty_When_Bsb_Not_Found()
         {
-            fileService.Setup(
-                f => f.GetAllBsbRecords()).Returns(new BsbRecordBuilder().WithAllFields().Build());
+            fileService.Setup(f => f.GetAllBsbRecords())
+                .Returns(Task.FromResult<List<BsbRecord>?>(
+                    new BsbRecordBuilder().AllRecordsWithAllFields().Build()));
 
-            var result = service.GetBsbRecord("Wrongd");
+            var result = await service.GetBsbRecord("Wrongd");
 
             Assert.Null(result);
+        }
+
+        [Fact]
+        public async Task UpdateBsbRecord_Should_Return_Call_UpdateBsbRecord_With_The_Right_Input_When_GetAllBsbRecords_Returns_A_List()
+        {
+            var bsbRecords = new BsbRecordBuilder().AllRecordsWithAllFields().Build();
+
+            fileService.Setup(f => f.GetAllBsbRecords())
+                .Returns(Task.FromResult<List<BsbRecord>?>(bsbRecords));
+
+            var newRecord = new BsbRecord(
+                "4", "111222", "CBA", "ANZ Smart Choice", "115 Pitt Street", "Sydney", "NSW", "2000", "PEH");
+
+            await service.UpdateBsbRecord(newRecord.Id, newRecord);
+
+            bsbRecords.Remove(bsbRecords[2]);
+            bsbRecords.Add(newRecord);
+
+            fileService.Verify(f => f.UpdateBsbRecord(bsbRecords));
+        }
+
+        [Fact]
+        public async Task UpdateBsbRecord_Should_Return_Call_UpdateBsbRecord_With_The_Right_Input_When_GetAllBsbRecords_Returns_Null()
+        {
+            fileService.Setup(f => f.GetAllBsbRecords())
+                .Returns(Task.FromResult<List<BsbRecord>?>(null));
+
+            var bsbRecord = new BsbRecordBuilder().SingleRecordsWithAllFields().Build()[0];
+            await service.UpdateBsbRecord(bsbRecord.Id, bsbRecord);
+
+            fileService.Verify(f => f.UpdateBsbRecord(new List<BsbRecord> { bsbRecord }));
         }
     }
 }

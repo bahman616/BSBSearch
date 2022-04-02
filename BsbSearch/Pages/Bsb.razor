@@ -7,48 +7,119 @@
 @using System.Text.Json
 @using System.Net.Http.Headers
 @using System.Linq
+@using System.Text
+@using BsbSearch.ViewModels
 @inject IHttpClientFactory ClientFactory
 
 <h1>Search for a BSB</h1>
 
-<div class="form-row">
-    <div class="form-group col-md-3 col-sm-12">
-        <label for="exampleInputEmail1">BSB Number</label>
-        <input @bind="bsb" class="form-control" placeholder="Enter BSB"/>
-    </div>
-</div>
-<button @onclick="Search" class="btn btn-primary">Search</button>
-
-
-@if (!string.IsNullOrEmpty(bsb) && BsbRecord == null)
+@if(IsLoading) 
 {
     <p><em>Loading...</em></p>
 }
-else if(BsbRecord != null)
+else 
 {
-    <div class="panel panel-default">
-      <h3 >Here are the details for @BsbRecord.Number:</h3>
-      <div class="panel-body">
-          <div>BSB: @BsbRecord.Number</div>
-          <div>FICode: @BsbRecord.FICode</div>
-          <div>Financial Institution Name: @BsbRecord.Name</div>
-          <div>BSB Address: @BsbRecord.Address</div>
-          <div>Suburb/Town/City: @BsbRecord.Suburb</div>
-          <div>State: @BsbRecord.State</div>
-          <div>Postcode: @BsbRecord.PostCode</div>
-          <div>Payment Systems: @BsbRecord.PaymentSystems</div>
-      </div>
+
+    <div class="form-row">
+        <div class="form-group col-md-3 col-sm-12">
+            <label>BSB Number</label>
+            <input @bind="bsb" class="form-control" placeholder="Enter BSB"/>
+        </div>
     </div>
+    <button @onclick="Search" class="btn btn-primary">Search</button>
+
+
+    @if (!IsEditMode && bsbRecord != null)
+    {
+        <div class="panel panel-default">
+            <h3 >Here are the details for @bsbRecord.Number:</h3>
+            <div class="panel-body">
+                <div>BSB: @bsbRecord.Number</div>
+                <div>FICode: @bsbRecord.FICode</div>
+                <div>Financial Institution Name: @bsbRecord.Name</div>
+                <div>BSB Address: @bsbRecord.Address</div>
+                <div>Suburb/Town/City: @bsbRecord.Suburb</div>
+                <div>State: @bsbRecord.State</div>
+                <div>Postcode: @bsbRecord.PostCode</div>
+                <div>Payment Systems: @bsbRecord.PaymentSystems</div>
+            </div>
+        </div>
+        <div>
+            <button class="btn btn-secondary" @onclick="Edit">Edit</button>
+        </div>
+    }
+    else if (bsbRecord != null)
+    {
+        <EditForm Model="@bsbRecord" OnValidSubmit="@HandleValidSubmit">
+
+            <div class="form-row">
+                <div class="form-group col-md-5 col-sm-12">
+                    <label for="number">BSB Number:</label>
+                    <InputText id="number" @bind-Value="bsbRecord.Number" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-5 col-sm-12">
+                    <label for="FICode">FICode:</label>
+                    <InputText id="FICode" @bind-Value="bsbRecord.FICode" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-5 col-sm-12">
+                    <label for="Name">Financial Institution Name:</label>
+                    <InputText id="Name" @bind-Value="bsbRecord.Name" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-5 col-sm-12">
+                    <label for="Address">BSB Address:</label>
+                    <InputText id="Address" @bind-Value="bsbRecord.Address" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-5 col-sm-12">
+                    <label for="Suburb">Suburb/Town/City:</label>
+                    <InputText id="Suburb" @bind-Value="bsbRecord.Suburb" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-5 col-sm-12">
+                    <label for="State">State:</label>
+                    <InputText id="State" @bind-Value="bsbRecord.State" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-5 col-sm-12">
+                    <label for="PostCode">PostCode:</label>
+                    <InputText id="PostCode" @bind-Value="bsbRecord.PostCode" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-5 col-sm-12">
+                    <label for="PaymentSystems">PaymentSystems:</label>
+                    <InputText id="PaymentSystems" @bind-Value="bsbRecord.PaymentSystems" />
+                </div>
+            </div>
+
+            <button class="btn btn-primary" type="submit">Submit</button>
+            <button class="btn btn-secondary" type="button" @onclick="CancelEdit">Cancel</button>
+        </EditForm>
+    }
+
 }
 
-
 @code {
-    private BsbRecord? BsbRecord;
+    private BsbRecordViewModel? bsbRecord;
+
+    private bool IsEditMode = false;
+    private bool IsLoading = false;
 
     public string bsb { get; set; } = "";
 
     protected async Task Search()
     {
+        IsLoading = true;
+
         var clientlocal = ClientFactory.CreateClient("LocalBackendApi");
         var response = await clientlocal.GetAsync($"api/bsb/{bsb}");
         var content = await response.Content.ReadAsStringAsync();
@@ -57,7 +128,38 @@ else if(BsbRecord != null)
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         };
-        BsbRecord = JsonSerializer.Deserialize<BsbRecord?>(content, options);
+        var originalBsbRecord = JsonSerializer.Deserialize<BsbRecord?>(content, options);
+        // This mapping is because we need to work on a mutable version of this object
+        // Because we want to allow users to edit
+        bsbRecord = Mappers.BsbRecordMapper.Map(originalBsbRecord);
+
+        IsLoading = false;
+
     }
+
+    private async Task HandleValidSubmit()
+    {
+        IsLoading = true;
+
+        var clientlocal = ClientFactory.CreateClient("LocalBackendApi");
+        var stringPayload = JsonSerializer.Serialize(bsbRecord);
+        var httpContent = new StringContent(stringPayload, Encoding.UTF8, "application/json");
+        var result = await clientlocal.PutAsync($"api/bsb/{bsbRecord?.Id}", httpContent);
+        result.EnsureSuccessStatusCode();
+        IsEditMode = result.IsSuccessStatusCode;
+
+        IsLoading = false;
+    }
+
+    private void Edit()
+    {
+        IsEditMode = true;
+    }
+
+    private void CancelEdit()
+    {
+        IsEditMode = false;
+    }
+
 
 }

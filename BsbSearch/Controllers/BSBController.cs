@@ -13,17 +13,26 @@ namespace BsbSearch.Controllers
             (_logger, _bsbService) = (logger, bsbService);
 
         [HttpGet]
-        public List<BsbRecord>? Get()
+        public async Task<List<BsbRecord>?> Get()
         {
             _logger.LogInformation("Getting all Bsbs");
-            return _bsbService.GetAllBsbRecords();
+            var results = await _bsbService.GetAllBsbRecords();
+            return results;
         }
 
         [HttpGet("{bsb}")]
-        public BsbRecord? Get(string bsb)
+        public async Task<BsbRecord?> Get(string bsb)
         {
             _logger.LogInformation("Getting Bsb: {bsb}", bsb);
-            return _bsbService.GetBsbRecord(bsb);
+            var result = await _bsbService.GetBsbRecord(bsb);
+            return result;
+        }
+
+        [HttpPut("{id}")]
+        public async Task Put(string id, BsbRecord bsbRecord)
+        {
+            _logger.LogInformation("Updating bsb: {bsb}", bsbRecord.Number);
+            await _bsbService.UpdateBsbRecord(id, bsbRecord);
         }
     }
 }
