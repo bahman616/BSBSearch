@@ -29,7 +29,7 @@ namespace BsbSearch.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task Put(string id, BsbRecord bsbRecord)
+        public async Task Put(string id, [FromBody]BsbRecord bsbRecord)
         {
             _logger.LogInformation("Updating bsb: {bsb}", bsbRecord.Number);
             await _bsbService.UpdateBsbRecord(id, bsbRecord);

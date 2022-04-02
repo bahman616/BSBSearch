@@ -10,7 +10,9 @@ namespace BsbSearch.Services
         public BsbService(ILogger<BsbService> logger, IFileService fileService) =>
             (_logger, _fileService) = (logger, fileService);
 
-        public async Task<List<BsbRecord>?> GetAllBsbRecords() => await _fileService.GetAllBsbRecords();
+        public async Task<List<BsbRecord>?> GetAllBsbRecords() => 
+            (await _fileService.GetAllBsbRecords())?
+            .OrderBy(b => b.Number).ToList();
 
         public async Task<BsbRecord?> GetBsbRecord(string bsb)
         {
