@@ -22,6 +22,7 @@ namespace BsbSearch.Services
             await this._fileService.AddRequestHistory(requestHistories);
         }
 
-        public Task<List<RequestHistory>?> GetAllRequestHistories() => _fileService.GetAllRequestHistories();
+        public async Task<List<RequestHistory>?> GetAllRequestHistories() => 
+            (await _fileService.GetAllRequestHistories())?.OrderByDescending(r => r.DateTimeInUTC).ToList();
     }
 }

@@ -91,11 +91,11 @@ else
     // Add paging because the page can be very large
     protected override void OnParametersSet()
     {
-        if (PageNumber == 0)
+        if (PageNumber > 0)
         {
-            PageNumber = 1;
+            PageNumber -= 1;
         }
-
+        
         PagedBsbRecords = AllBsbRecords?.Skip(PageNumber*10).Take(10).ToList();
 
         FirstPage = (PageNumber - 5) <= 0 ? 1: (PageNumber - 5);
