@@ -76,3 +76,11 @@ a, .btn-link {
 .panel {
     margin-top: 10px;
 }
+
+.failed-row {
+    background-color: pink;
+}
+
+.succeeded-row {
+background-color: white;
+}

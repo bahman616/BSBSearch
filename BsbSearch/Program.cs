@@ -1,4 +1,3 @@
-using BsbSearch.Data;
 using BsbSearch.Infrastructure;
 using BsbSearch.Services;
 
@@ -10,10 +9,10 @@ builder.Logging.AddConsole();
 builder.Services.AddRazorPages();
 
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IBsbService, BsbService>();
 builder.Services.AddScoped<IPartnerService, PartnerService>();
+builder.Services.AddScoped<IRequestHistoryService, RequestHistoryService>();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient("LocalBackendApi", client => client.BaseAddress = new Uri("https://localhost:7287/"));

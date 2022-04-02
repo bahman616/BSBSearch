@@ -3,6 +3,7 @@
     public record Partner(
         string Name,
         string Url,
-        string Key
+        string Key,
+        bool IsLocal
     );
 }

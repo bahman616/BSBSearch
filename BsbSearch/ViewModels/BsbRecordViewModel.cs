@@ -2,7 +2,7 @@
 {
     public class BsbRecordViewModel
     {
-        public string Id { get; set; }
+        public string Id { get; set; } = String.Empty;
         public string Number { get; set; } = String.Empty;
         public string FICode { get; set; } = String.Empty;
         public string Name { get; set; } = String.Empty;

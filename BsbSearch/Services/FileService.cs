@@ -11,6 +11,12 @@ namespace BsbSearch.Services
             {
                 string json = await r.ReadToEndAsync();
                 var items = JsonSerializer.Deserialize<List<BsbRecord>>(json);
+
+                if (string.IsNullOrEmpty(json))
+                {
+                    return null;
+                }
+
                 return items;
             }
         }
@@ -30,6 +36,38 @@ namespace BsbSearch.Services
             {
                 string json = await r.ReadToEndAsync();
                 var items = JsonSerializer.Deserialize<List<Partner>>(json);
+
+                if (string.IsNullOrEmpty(json))
+                {
+                    return null;
+                }
+
+                return items;
+            }
+        }
+
+        public async Task AddRequestHistory(List<RequestHistory> requestHistory)
+        {
+            using (StreamWriter w = new StreamWriter("data/RequestsHistory.json"))
+            {
+                var json = JsonSerializer.Serialize(requestHistory);
+
+                await w.WriteAsync(json);
+            }
+        }
+
+        public async Task<List<RequestHistory>?> GetAllRequestHistories()
+        {
+            using (StreamReader r = new StreamReader("data/RequestsHistory.json"))
+            {
+                string json = await r.ReadToEndAsync();
+                
+                if (string.IsNullOrEmpty(json))
+                {
+                    return null;
+;                }
+
+                var items = JsonSerializer.Deserialize<List<RequestHistory>>(json);
                 return items;
             }
         }

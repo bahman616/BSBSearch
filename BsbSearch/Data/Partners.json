@@ -2,11 +2,19 @@
   {
     "Name": "TeamOne",
     "URL": "https://localhost:4504/Listen",
-    "Key":  "FFGFG&^%%SsasDDH"
+    "Key": "FFGFG&^%%SsasDDH",
+    "IsLocal": false
   },
   {
     "Name": "TeamTwo",
     "URL": "https://localhost:4505/Listen",
-    "Key": "44GFD(&}JFFdsdd"
+    "Key": "44GFD(&}JFFdsdd",
+    "IsLocal": false
+  },
+  {
+    "Name": "local",
+    "URL": "https://localhost:4505/Listen",
+    "Key": "vvvcx#$cddfdf",
+    "IsLocal":  true
   }
 ]
