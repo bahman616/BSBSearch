@@ -22,7 +22,7 @@ namespace BsbSearch.Test.Services
         private Mock<IPartnerService> _partnerService = new Mock<IPartnerService>();
 
         public BsbServiceTests() => 
-            this.service = new BsbService(new Mock<ILogger<BsbService>>().Object, fileService.Object, _partnerService.Object, _clientFactory.Object);
+            service = new BsbService(new Mock<ILogger<BsbService>>().Object, fileService.Object, _partnerService.Object, _clientFactory.Object);
 
         [Fact]
         public async Task GetBsbRecord_Should_Return_ArgumentNullException_When_Bsb_IsNull()
