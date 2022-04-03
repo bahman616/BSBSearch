@@ -90,3 +90,9 @@ background-color: white;
     margin-top: 20px;
     margin-bottom: 20px;
 }
+
+.bsb-failure {
+    color: red;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}

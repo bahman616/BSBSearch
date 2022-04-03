@@ -15,6 +15,11 @@
 
 <h1>Search for a BSB</h1>
 
+@if (FailedToLoad)
+{
+    <div class="bsb-failure col-md-5 col-sm-12">Failed to search for the BSB number. 
+        Please make sure it is a valid BSB number and try again.</div>
+}
 @if(IsLoading) 
 {
     <p><em>Loading...</em></p>
@@ -120,27 +125,37 @@ else
     private bool IsEditMode = false;
     private bool IsLoading = false;
     private bool Edited = false;
+    private bool FailedToLoad = false;
 
     public string bsb { get; set; } = "";
 
     protected async Task Search()
     {
         IsLoading = true;
+        FailedToLoad = false;
 
         var clientlocal = ClientFactory.CreateClient("LocalBackendApi");
         clientlocal.DefaultRequestHeaders.Add(Configuration.TeamNameHeader, optionsConfiguration.Value.LocalTeamName);
         clientlocal.DefaultRequestHeaders.Add(Configuration.TeamKeyHeader, optionsConfiguration.Value.LocalTeamKey);
-        var response = await clientlocal.GetAsync($"api/bsb/{bsb}");
-        var content = await response.Content.ReadAsStringAsync();
 
-        var options = new JsonSerializerOptions 
+        try
         {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        };
-        var originalBsbRecord = JsonSerializer.Deserialize<BsbRecord?>(content, options);
-        // This mapping is because we need to work on a mutable version of this object
-        // Because we want to allow users to edit
-        bsbRecord = Mappers.BsbRecordMapper.Map(originalBsbRecord);
+            var response = await clientlocal.GetAsync($"api/bsb/{bsb}");
+            var content = await response.Content.ReadAsStringAsync();
+
+            var options = new JsonSerializerOptions 
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            };
+            var originalBsbRecord = JsonSerializer.Deserialize<BsbRecord?>(content, options);
+            // This mapping is because we need to work on a mutable version of this object
+            // Because we want to allow users to edit
+            bsbRecord = Mappers.BsbRecordMapper.Map(originalBsbRecord);
+        }
+        catch
+        {
+            FailedToLoad = true;
+        }
 
         IsLoading = false;
 
