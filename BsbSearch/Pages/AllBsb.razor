@@ -3,11 +3,14 @@
 
 <PageTitle>All BSB Numbers</PageTitle>
 
+@using BsbSearch.Infrastructure
 @using BsbSearch.Models
 @using System.Text.Json
 @using System.Net.Http.Headers
 @using System.Linq
+@using Microsoft.Extensions.Options
 @inject IHttpClientFactory ClientFactory
+@inject IOptions<Configuration> optionsConfiguration
 
 <h1>All BSB Numbers</h1>
 
@@ -68,9 +71,8 @@ else
     protected override async Task OnInitializedAsync()
     {
         var clientlocal = ClientFactory.CreateClient("LocalBackendApi");
-        // These credentials can be moved to app settings
-        clientlocal.DefaultRequestHeaders.Add("team-name","local");
-        clientlocal.DefaultRequestHeaders.Add("very-very-secure", "vvvcx#$cddfdf");
+        clientlocal.DefaultRequestHeaders.Add(Configuration.TeamNameHeader, optionsConfiguration.Value.LocalTeamName);
+        clientlocal.DefaultRequestHeaders.Add(Configuration.TeamKeyHeader, optionsConfiguration.Value.LocalTeamKey);
         var response = await clientlocal.GetAsync("api/bsb");
 
         var content = await response.Content.ReadAsStringAsync();

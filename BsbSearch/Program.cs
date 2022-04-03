@@ -8,6 +8,8 @@ builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Services.AddRazorPages();
 
+builder.Services.Configure<Configuration>(builder.Configuration.GetSection("TeamsCredentials"));
+
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IBsbService, BsbService>();

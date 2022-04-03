@@ -9,8 +9,8 @@ namespace BsbSearch.Test.Builders
 
         public PartnerBuilder AllPartners()
         {
-            partners.Add(new Partner("Team1", "url1", "Key1", false));
-            partners.Add(new Partner("Team2", "url2", "Key2", false));
+            partners.Add(new Partner("Team1", "http://url1.com", "Key1", false));
+            partners.Add(new Partner("Team2", "http://url2.com", "Key2", false));
             return this;
         }
         public List<Partner> Build()

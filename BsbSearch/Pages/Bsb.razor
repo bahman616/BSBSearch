@@ -2,13 +2,16 @@
 
 <PageTitle>Search for a BSB</PageTitle>
 
+@using BsbSearch.Infrastructure
 @using BsbSearch.Models
 @using System.Text.Json
 @using System.Net.Http.Headers
 @using System.Linq
 @using System.Text
 @using BsbSearch.ViewModels
+@using Microsoft.Extensions.Options
 @inject IHttpClientFactory ClientFactory
+@inject IOptions<Configuration> optionsConfiguration
 
 <h1>Search for a BSB</h1>
 
@@ -18,7 +21,6 @@
 }
 else 
 {
-
     <div class="form-row">
         <div class="form-group col-md-3 col-sm-12">
             <label>BSB Number</label>
@@ -27,7 +29,12 @@ else
     </div>
     <button @onclick="Search" class="btn btn-primary">Search</button>
 
-
+    @if (Edited)
+    {
+        <div class="bsb-edited col-md-5 col-sm-12">The Selected BSB Record is updated. All other teams were notified using their web hooks. 
+            They should request for details shortly.
+            You can check "All Requests" page to check the status</div>
+    }
     @if (!IsEditMode && bsbRecord != null)
     {
         <div class="panel panel-default">
@@ -112,6 +119,7 @@ else
 
     private bool IsEditMode = false;
     private bool IsLoading = false;
+    private bool Edited = false;
 
     public string bsb { get; set; } = "";
 
@@ -120,9 +128,8 @@ else
         IsLoading = true;
 
         var clientlocal = ClientFactory.CreateClient("LocalBackendApi");
-        // These credentials can be moved to app settings
-        clientlocal.DefaultRequestHeaders.Add("team-name","local");
-        clientlocal.DefaultRequestHeaders.Add("very-very-secure", "vvvcx#$cddfdf");
+        clientlocal.DefaultRequestHeaders.Add(Configuration.TeamNameHeader, optionsConfiguration.Value.LocalTeamName);
+        clientlocal.DefaultRequestHeaders.Add(Configuration.TeamKeyHeader, optionsConfiguration.Value.LocalTeamKey);
         var response = await clientlocal.GetAsync($"api/bsb/{bsb}");
         var content = await response.Content.ReadAsStringAsync();
 
@@ -144,22 +151,23 @@ else
         IsLoading = true;
 
         var clientlocal = ClientFactory.CreateClient("LocalBackendApi");
-        // These credentials can be moved to app settings
-        clientlocal.DefaultRequestHeaders.Add("team-name","local");
-        clientlocal.DefaultRequestHeaders.Add("very-very-secure", "vvvcx#$cddfdf");
+        clientlocal.DefaultRequestHeaders.Add(Configuration.TeamNameHeader, optionsConfiguration.Value.LocalTeamName);
+        clientlocal.DefaultRequestHeaders.Add(Configuration.TeamKeyHeader, optionsConfiguration.Value.LocalTeamKey);
         var stringPayload = JsonSerializer.Serialize(bsbRecord);
         var httpContent = new StringContent(stringPayload, Encoding.UTF8, "application/json");
 
         var result = await clientlocal.PutAsync($"api/bsb/{bsbRecord?.Id}", httpContent);
         result.EnsureSuccessStatusCode();
 
-        IsEditMode = result.IsSuccessStatusCode;
+        IsEditMode = !result.IsSuccessStatusCode;
+        Edited = result.IsSuccessStatusCode;
         IsLoading = false;
     }
 
     private void Edit()
     {
         IsEditMode = true;
+        Edited = false;
     }
 
     private void CancelEdit()

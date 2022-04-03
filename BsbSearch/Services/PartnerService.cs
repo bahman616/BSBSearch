@@ -1,4 +1,6 @@
-﻿namespace BsbSearch.Services
+﻿using BsbSearch.Models;
+
+namespace BsbSearch.Services
 {
     public class PartnerService: IPartnerService
     {
@@ -20,5 +22,8 @@
 
             return partners.Any(p => p.Name == name && p.Key == key);
         }
+
+        public async Task<List<Partner>?> GetAllPartners() => 
+            (await _fileService.GetAllPartners())?.Where(p => !p.IsLocal).ToList();
     }
 }

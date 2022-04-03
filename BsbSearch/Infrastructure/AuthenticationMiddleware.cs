@@ -9,7 +9,7 @@ namespace BsbSearch.Infrastructure
         
         public async Task Invoke(HttpContext context, IPartnerService _partnerService)
         {
-            if (context.Request.Path.HasValue && context.Request.Path.Value.Contains("api/"))
+            if (context.Request.Path.HasValue && context.Request.Path.Value.Contains("api/") && !context.Request.Path.Value.Contains("api/fakeTeams"))
             {
                 if (!context.Request.Headers.Keys.Contains("team-name"))
                 {

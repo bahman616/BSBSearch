@@ -13,7 +13,7 @@
 
 @if (PagedRecords == null)
 {
-    <p><em>Loading...</em></p>
+    <p><em> @LoadingText</em></p>
 }
 else
 {
@@ -52,6 +52,8 @@ else
     private List<RequestHistory>? PagedRecords;
     private List<RequestHistory>? AllRecords;
 
+    private string LoadingText = "Loading...";
+
     [Parameter]
     public int PageNumber { get; set; } = 1;
 
@@ -73,6 +75,12 @@ else
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         };
+        if (string.IsNullOrEmpty(content))
+        {
+            LoadingText = "Not Found!";
+            return;
+        }
+
         AllRecords = JsonSerializer.Deserialize<List<RequestHistory>>(content, options);
 
         if (AllRecords != null)

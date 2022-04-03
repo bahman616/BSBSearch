@@ -1,20 +1,20 @@
 [
   {
     "Name": "TeamOne",
-    "URL": "https://localhost:4504/Listen",
+    "Url": "https://localhost:7287/api/fakeTeams/team1",
     "Key": "FFGFG&^%%SsasDDH",
     "IsLocal": false
   },
   {
     "Name": "TeamTwo",
-    "URL": "https://localhost:4505/Listen",
+    "Url": "https://localhost:7287/api/fakeTeams/team2",
     "Key": "44GFD(&}JFFdsdd",
     "IsLocal": false
   },
   {
     "Name": "local",
-    "URL": "https://localhost:4505/Listen",
+    "Url": "",
     "Key": "vvvcx#$cddfdf",
-    "IsLocal":  true
+    "IsLocal": true
   }
 ]

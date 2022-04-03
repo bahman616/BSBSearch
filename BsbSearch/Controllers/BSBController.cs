@@ -25,7 +25,7 @@ namespace BsbSearch.Controllers
             try
             {
                 var results = await _bsbService.GetAllBsbRecords();
-                await _requestHistory.Add(requestHistory);
+                await AddRequestHistory(requestHistory);
                 return results;
 
             }
@@ -37,7 +37,7 @@ namespace BsbSearch.Controllers
                 requestHistory.Status = RequestStatus.Fail;
                 requestHistory.StatusMessage = ex.Message;
 
-                await _requestHistory.Add(requestHistory);
+                await AddRequestHistory(requestHistory);
                 throw;
             }
 
@@ -54,7 +54,7 @@ namespace BsbSearch.Controllers
             try
             {
                 var result = await _bsbService.GetBsbRecord(bsb);
-                await _requestHistory.Add(requestHistory);
+                await AddRequestHistory(requestHistory);
                 return result;
             }
             catch (Exception ex)
@@ -63,8 +63,8 @@ namespace BsbSearch.Controllers
                 
                 requestHistory.Status = RequestStatus.Fail;
                 requestHistory.StatusMessage = ex.Message;
-                
-                await _requestHistory.Add(requestHistory);
+
+                await AddRequestHistory(requestHistory);
                 throw;
             }
         }
@@ -74,6 +74,15 @@ namespace BsbSearch.Controllers
         {
             _logger.LogInformation("Updating bsb: {bsb}", bsbRecord.Number);
             await _bsbService.UpdateBsbRecord(id, bsbRecord);
+        }
+
+        private async Task AddRequestHistory(RequestHistory requestHistory)
+        {
+            // don't need to keep the logs for local calls from the UI
+            if (requestHistory.TeamName != "local")
+            {
+                await _requestHistory.Add(requestHistory);
+            }
         }
     }
 }
